@@ -40,6 +40,10 @@ class Table:
         if self.table_type == 'VIEW':
             table = get_table_with_retry(dataset.project.client, ref)
             self.view_query = table.view_query
+        elif self.table_type == 'MATERIALIZED_VIEW':
+            if export_schema:
+                table = get_table_with_retry(dataset.project.client, ref)
+                self.schema = list(map(lambda x: x.to_api_repr(), table.schema))
         elif self.table_type == 'TABLE':
             if export_schema:
                 table = get_table_with_retry(dataset.project.client, ref)
@@ -63,6 +67,8 @@ class Table:
             The file extension (i.e. "sql")
         """
         if self.table_type == 'VIEW':
+            return 'sql'
+        elif self.table_type == 'MATERIALIZED_VIEW':
             return 'sql'
         else:
             return 'json'
